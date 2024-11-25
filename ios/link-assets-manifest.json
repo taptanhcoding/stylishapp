@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/pages/splash/assets/imgs/splash1.png",
+      "sha1": "ba1a7c41a3b4a4ea3248875002b547d92e4229f4"
+    },
+    {
+      "path": "src/pages/splash/assets/imgs/splash2.png",
+      "sha1": "f03893d77b37e2a3eb74340415b0d1f60d68d146"
+    },
+    {
+      "path": "src/pages/splash/assets/imgs/splash3.png",
+      "sha1": "734a0245c64d673bb33d20a95048b1dc6115614c"
+    }
+  ]
+}
