@@ -10,7 +10,8 @@ import {
   useWindowDimensions,
   StyleSheet,
   Animated,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  SafeAreaView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -43,6 +44,8 @@ export default memo(function SplashScreen() {
 
 const setViewedOnboarding = async() => {
   try{
+    console.log("onboarding");
+    
     await AsyncStorage.setItem('@viewedOnboarding', 'true');
     navigation.navigate('Home');
   }catch(error){
@@ -53,50 +56,52 @@ const setViewedOnboarding = async() => {
   const viewConfig = React.useRef({viewAreaCoveragePercentThreshold: 50}).current;
   return (
     <View style={styles.container}>
-      <View style={{width: '100%',paddingLeft:38,paddingRight:38,flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={styles.textHeader}> {currentIndex + 1}</Text><Text style={[styles.textHeader,{color:'#A0A0A1'}]} >/{data.length}</Text>
-        </View>
-        <TouchableWithoutFeedback onPress={setViewedOnboarding}>
-          <Text style={styles.textHeader}>Skip</Text>
-        </TouchableWithoutFeedback>
-      </View>
-      <FlatList
-        horizontal
-        data={data}
-        keyExtractor={item => item.id.toString()}
-        pagingEnabled
-        bounces={false}
-        onScroll={Animated.event([{nativeEvent: {contentOffset: {x: scrollX}}}],{useNativeDriver: false})}
-        scrollEventThrottle={32}
-        onViewableItemsChanged={viewableItemsChanged}
-        viewabilityConfig={viewConfig}
-        showsHorizontalScrollIndicator={false}
-        ref={sliderRef}
-        
-        renderItem={({item}) => (
-          <View style={{width, padding: 38}}>
-            <Image style={styles.image} source={item.image} />
-            <View style={styles.textContainer}>
-              <Text style={[styles.title, styles.textCenter]}>{item.title}</Text>
-              <Text style={[styles.des, styles.textCenter]}>{item.des}</Text>
-            </View>
+      <SafeAreaView>
+        <View style={{width: '100%',paddingLeft:38,paddingRight:38,flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={styles.textHeader}> {currentIndex + 1}</Text><Text style={[styles.textHeader,{color:'#A0A0A1'}]} >/{data.length}</Text>
           </View>
-        )}
-      />
-        <View style={styles.footer}>
-         <TouchableWithoutFeedback onPress={ScrollToPrev}>
-           <View>
-            <Text style={styles.prev}>{currentIndex > 0 ? 'Prev' : ''}</Text>
-           </View>
-         </TouchableWithoutFeedback>
-          <DotPaging data={data} scrollX={scrollX} />
-          <TouchableWithoutFeedback onPress={currentIndex < data.length - 1 ? ScrollToNext : setViewedOnboarding}>
-            <View>
-              <Text style={styles.next}>{currentIndex < data.length - 1 ? 'Next' : 'Get Started'}</Text>
-            </View>
+          <TouchableWithoutFeedback onPress={setViewedOnboarding}>
+            <Text style={styles.textHeader}>Skip</Text>
           </TouchableWithoutFeedback>
         </View>
+        <FlatList
+          horizontal
+          data={data}
+          keyExtractor={item => item.id.toString()}
+          pagingEnabled
+          bounces={false}
+          onScroll={Animated.event([{nativeEvent: {contentOffset: {x: scrollX}}}],{useNativeDriver: false})}
+          scrollEventThrottle={32}
+          onViewableItemsChanged={viewableItemsChanged}
+          viewabilityConfig={viewConfig}
+          showsHorizontalScrollIndicator={false}
+          ref={sliderRef}
+          
+          renderItem={({item}) => (
+            <View style={{width, padding: 38}}>
+              <Image style={styles.image} source={item.image} />
+              <View style={styles.textContainer}>
+                <Text style={[styles.title, styles.textCenter]}>{item.title}</Text>
+                <Text style={[styles.des, styles.textCenter]}>{item.des}</Text>
+              </View>
+            </View>
+          )}
+        />
+          <View style={styles.footer}>
+           <TouchableWithoutFeedback onPress={ScrollToPrev}>
+             <View>
+              <Text style={styles.prev}>{currentIndex > 0 ? 'Prev' : ''}</Text>
+             </View>
+           </TouchableWithoutFeedback>
+            <DotPaging data={data} scrollX={scrollX} />
+            <TouchableWithoutFeedback onPress={currentIndex < data.length - 1 ? ScrollToNext : setViewedOnboarding}>
+              <View>
+                <Text style={styles.next}>{currentIndex < data.length - 1 ? 'Next' : 'Get Started'}</Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+      </SafeAreaView>
     </View>
   );
 });

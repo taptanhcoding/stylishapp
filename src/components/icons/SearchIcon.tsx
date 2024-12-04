@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-export const SearchIcon = ({color="black", size=24}: {color: string, size: number}) => {
+export const SearchIcon = ({color="black", size=24}: {color?: string, size?: number}) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path

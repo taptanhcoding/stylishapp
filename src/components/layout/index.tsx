@@ -13,12 +13,12 @@ export default function ContentLayout({children}:componentWithChildren){
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:'#fff',
+    backgroundColor:'#FDFDFD',
     paddingLeft: 20,
     paddingRight: 20,
   },
   light:{
-    backgroundColor:'#fff',
+    backgroundColor:'#FDFDFD',
   },
   dark:{
     backgroundColor:'#000',

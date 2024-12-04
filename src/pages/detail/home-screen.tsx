@@ -1,20 +1,34 @@
 import React from 'react';
-import {Button} from '@react-navigation/elements';
-import {useNavigation} from '@react-navigation/native';
 import {memo} from 'react';
-import {View, Text} from 'react-native';
+import {
+  View,
+  Text,
+  VirtualizedList,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import ContentLayout from '../../components/layout';
-
+import {HeaderFilter, HeaderTop} from '../../components/layout/header';
 export default memo(function HomeScreen() {
-  const navigation = useNavigation();
+  const {height,width} = useWindowDimensions();
   return (
     <ContentLayout>
-      <View>
-        <Text>HomeScreen</Text>
-        <Button onPress={() => navigation.navigate('Trending')}>
-          Goto Trending
-        </Button>
-      </View>
+      <HeaderTop/>
+      <HeaderFilter title="All Featured"/>
+      <View style={{height:50,backgroundColor: "white"}}></View>
     </ContentLayout>
   );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'red',
+  },
+  item: {
+    padding: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
 });

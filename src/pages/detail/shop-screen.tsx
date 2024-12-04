@@ -9,7 +9,7 @@ export default memo(function ShopScreen() {
   return (
     <View>
       <Text>HomeScreen</Text>
-      <Button onPress={() => navigation.navigate('Trending')}>
+      <Button >
         Goto Trending
       </Button>
     </View>

@@ -3,7 +3,7 @@
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable react/react-in-jsx-scope */
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {lazy, useEffect} from 'react';
+import React, {lazy, useEffect} from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useNavigation} from '@react-navigation/native';
@@ -13,7 +13,9 @@ import {HeartIcon} from '../components/icons/HeartIcon';
 import {CartIcon} from '../components/icons/CartIcon';
 import {SearchIcon} from '../components/icons/SearchIcon';
 import {SettingIcon} from '../components/icons/SettingIcon';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
+import ContentLayout from '../components/layout';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 //auth
 const SigninScreen = lazy(() => import('../pages/auth/signin-screen'));
@@ -40,7 +42,24 @@ function NavTab() {
         headerShown: false,
         animation: 'shift',
       }}
-      initialRouteName="Home">
+      initialRouteName="Home"
+      layout={({children}) => (
+        <ErrorBoundary>
+          <React.Suspense
+            fallback={
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text>Loading…</Text>
+              </View>
+            }>
+            {children}
+          </React.Suspense>
+        </ErrorBoundary>
+      )}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -65,34 +84,46 @@ function NavTab() {
         name="Shop"
         component={ShopScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <CartIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({color, size}) => <CartIcon color={color} size={size} />,
           tabBarLabel: '',
           tabBarInactiveTintColor: '#000',
           tabBarActiveTintColor: '#fff',
           // tabBarLabelStyle: ,
-          tabBarButton: (props:any) => {
-            console.log("props", props);
-            const {accessibilityState: {selected}, ...rest} = props;
+          tabBarButton: (props: any) => {
+            const {
+              accessibilityState: {selected},
+              children,
+              onPress,
+              onLongPress,
+              ...rest
+            } = props;
+            console.log({rest});
+
             return (
-              <TouchableOpacity {...props} style={{
-                position: 'absolute',
-                top: -15,
-                left: '50%',
-                transform: [{ translateX: "-50%" }],
-                padding:12.5,
-                paddingLeft:11,
-                borderRadius: 100,
-                boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)',
-                zIndex: 1000,
-                backgroundColor:selected ? '#EB3030' : '#fff',
-                width: 54,
-                height: 54,
-              }}>
-                {props.children}
+              <TouchableOpacity
+                onPress={onPress}
+                onLongPress={onLongPress}
+                style={{
+                  position: 'absolute',
+                  top: -15,
+                  left: '50%',
+                  transform: [{translateX: -27}],
+                  padding: 12.5,
+                  paddingLeft: 11,
+                  borderRadius: 100,
+                  elevation: 5, // Thay thế cho boxShadow trên Android
+                  shadowColor: '#000', // Dành cho iOS
+                  shadowOffset: {width: 0, height: 2}, // Dành cho iOS
+                  shadowOpacity: 0.1, // Dành cho iOS
+                  shadowRadius: 5, // Dành cho iOS
+                  zIndex: 1000,
+                  backgroundColor: selected ? '#EB3030' : '#fff',
+                  width: 54,
+                  height: 54,
+                }}>
+                {children}
               </TouchableOpacity>
-            )
+            );
           },
         }}
       />
@@ -133,7 +164,7 @@ export const Navigation = () => {
           screen: 'Signin',
         });
       } else if (value !== null && valueAuth !== null) {
-        navigation.navigate('Home',{screen: "Home"});
+        navigation.navigate('Home', {screen: 'Home'});
       }
     } catch (error) {
       console.log(error);
