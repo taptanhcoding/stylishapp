@@ -5,6 +5,7 @@ import {
   Text,
   TouchableWithoutFeedback,
   Image,
+  Platform,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import InputComponent from '../../components/InputComponent';
@@ -12,7 +13,10 @@ import {SearchIcon} from '../../components/icons/SearchIcon';
 import {MicIcon} from '../../components/icons/MicIcon';
 import Voice from '@react-native-voice/voice';
 import  debounce from 'lodash.debounce';
+import { PermissionsAndroid } from 'react-native';
 import UpDownArrowIcon from '../../components/icons/UpDownArrowIcon';
+
+
 export const HeaderFilter = ({title}:{title:string}) => {
   const [isListening, setIsListening] = useState(false);
   const [text,setText] = useState<string>('')
@@ -20,34 +24,36 @@ export const HeaderFilter = ({title}:{title:string}) => {
   const setValueText = useCallback(debounce(async(value) => {
     console.log("value listent",value);
     setText(value)
-    // inputRef.current.setNativeProps({text: value})
     await stopListening()
   },500),[inputRef])
 
   const startListening = async () => {
     try {
       inputRef.current.blur()
-      // inputRef.current.setNativeProps({text: "Đang lắng nghe..."})
       setText("Đang lắng nghe...")
       setIsListening(true);
-      Voice.start('vi-VN'); // Ngôn ngữ tùy chọn (vd: 'vi-VN' cho tiếng Việt)
-    } catch (e) {
-      console.error(e);
+      await Voice.start('vi-VN'); 
+    } catch (e:any) {
+      console.error('error start',e.toString());
     }
   };
 
   const stopListening = async () => {
     try {
       console.log("Stop Listening");
-      // inputRef.current.setNativeProps({placeholder: "Search any Product.."})
-      setIsListening(false);
       await Voice.stop();
-    } catch (e) {
-      console.error(e);
+    } catch (e:any) {
+      console.error("Lỗi khi dừng nghe",Voice.stop,e.toString());
+      setText('')
+    }
+    finally {
+      setIsListening(false);
     }
   };
 
   const onSpeechResults = (e:any) => {
+    console.log("results:::",e,e.value[0]);
+    
     setValueText(e.value[0])
     
   };
@@ -66,12 +72,39 @@ export const HeaderFilter = ({title}:{title:string}) => {
     console.log("Submit",e.nativeEvent.text);
     
   }
+
+  const requestRecordAudioPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Microphone Permission',
+          message: 'We need access to your microphone to process speech recognition.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Microphone permission granted');
+        Voice.start('vi-VN'); // Start voice recognition after permission is granted
+      } else {
+        console.log('Microphone permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
   useEffect(() => {
+    Voice.onSpeechStart = (e) => console.log('Speech started', e);
     Voice.onSpeechResults = onSpeechResults;
     Voice.onSpeechError = onSpeechError;
+    // requestRecordAudioPermission()
     if(inputRef.current)
     inputRef.current.setNativeProps({placeholder: "Search any Product.."})
     return () => {
+      console.log("xoa Voice");
+      
       Voice.destroy().then(Voice.removeAllListeners);
     };
   },[])
@@ -81,14 +114,14 @@ export const HeaderFilter = ({title}:{title:string}) => {
         <InputComponent
           ref={inputRef}
           prefix={<SearchIcon color="#BBBBBB" />}
-          suffix={<MicIcon />}
+          suffix={Platform.OS != "android" && <MicIcon />}
           onPressSuffix={isListening ? stopListening : startListening}
           styleWrappe={{padding: 8, paddingLeft: 46, paddingRight: 50,backgroundColor:"#FFFFFF"}}
           styleInput={{fontSize: 20}}
           onChangeText={changeText}
           value={text}
           onSubmitEditing={submitValue}
-          // placeholder={isListening? "Đang lắng nghe ...":"Seach any Product..."}
+          placeholder={isListening? "Đang lắng nghe ...":"Seach any Product..."}
           onC
         />
       </View>
